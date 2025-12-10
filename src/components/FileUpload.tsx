@@ -22,6 +22,7 @@ export function FileUpload({
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<Record<string, number>>({});
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const validateFile = useCallback((file: File): string | null => {
     if (!allowedTypes.includes(file.type)) {
@@ -37,10 +38,15 @@ export function FileUpload({
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
 
+    // Reset previous errors
+    setUploadError(null);
+    
     // Validate all files first
     const errors = files.map(validateFile).filter(Boolean);
     if (errors.length > 0) {
-      onError(errors.join('\n'));
+      const errorMessage = errors.join('\n');
+      setUploadError(errorMessage);
+      onError(errorMessage);
       return;
     }
 
@@ -72,10 +78,15 @@ export function FileUpload({
 
       onUploadComplete(uploadedUrls);
     } catch (error) {
-      onError(error instanceof Error ? error.message : 'Upload failed');
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
+      setUploadError(errorMessage);
+      onError(errorMessage);
     } finally {
       setUploading(false);
-      setProgress({});
+      // Keep progress visible for a moment to show completion
+      setTimeout(() => {
+        setProgress({});
+      }, 2000);
     }
   };
 
@@ -84,31 +95,40 @@ export function FileUpload({
       <div className="relative">
         <label className="block">
           <span className="sr-only">Choose file{multiple ? 's' : ''}</span>
-          <input
-            type="file"
-            className="block w-full text-sm text-primary-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-full file:border-0
-              file:text-sm file:font-semibold
-              file:bg-primary-50 file:text-primary-700
-              hover:file:bg-primary-100
-              disabled:opacity-50 disabled:cursor-not-allowed"
-            onChange={handleFileChange}
-            accept={allowedTypes.join(',')}
-            multiple={multiple}
-            disabled={uploading}
-          />
+          <div className="flex items-center justify-center w-full">
+            <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-primary-300 border-dashed rounded-lg cursor-pointer bg-primary-50 hover:bg-primary-100 transition-all duration-300">
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg className="w-8 h-8 mb-4 text-primary-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                </svg>
+                <p className="mb-2 text-sm text-primary-600">
+                  <span className="font-semibold">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-primary-600">
+                  {multiple ? 'Upload multiple files' : 'Upload a file'} (Max size: {maxSize / 1024 / 1024}MB)
+                </p>
+              </div>
+              <input
+                type="file"
+                className="hidden"
+                onChange={handleFileChange}
+                accept={allowedTypes.join(',')}
+                multiple={multiple}
+                disabled={uploading}
+              />
+            </label>
+          </div>
         </label>
 
         {uploading && Object.entries(progress).map(([fileName, value]) => (
-          <div key={fileName} className="mt-2">
-            <div className="flex justify-between text-sm text-primary-600 mb-1">
+          <div key={fileName} className="mt-4">
+            <div className="flex justify-between text-sm text-primary-700 mb-1">
               <span className="truncate">{fileName}</span>
               <span>{Math.round(value)}%</span>
             </div>
-            <div className="w-full bg-primary-100 rounded-full h-2">
+            <div className="w-full bg-primary-100 rounded-full h-2.5">
               <div
-                className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                className="bg-primary-600 h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${value}%` }}
               />
             </div>
@@ -116,12 +136,27 @@ export function FileUpload({
         ))}
       </div>
 
-      <p className="mt-2 text-sm text-primary-600">
-        {multiple ? 'Drop files here or click to upload' : 'Drop a file here or click to upload'}
-      </p>
-      <p className="text-xs text-primary-500">
-        Maximum file size: {maxSize / 1024 / 1024}MB
-      </p>
+      {/* Error message display */}
+      {uploadError && (
+        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span className="text-red-700 font-medium">Upload Error</span>
+          </div>
+          <p className="mt-2 text-red-600 text-sm whitespace-pre-line">{uploadError}</p>
+        </div>
+      )}
+
+      <div className="mt-4 text-sm text-primary-700">
+        <p>
+          {multiple ? 'Drop files here or click to upload' : 'Drop a file here or click to upload'}
+        </p>
+        <p className="text-xs text-primary-600 mt-1">
+          Supported formats: {allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}
+        </p>
+      </div>
     </div>
   );
 }

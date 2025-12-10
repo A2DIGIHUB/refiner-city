@@ -34,14 +34,16 @@ const {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <meta name="theme-color" content="#43302b" />
+    <meta name="theme-color" content="#7f1d1d" />
 
     <!-- Cache Control -->
     <meta http-equiv="Cache-Control" content="max-age=31536000" />
   </head>
-  <body class="min-h-screen bg-white">
+  <body class="min-h-screen bg-white flex flex-col">
     <Navigation />
-    <slot />
+    <main class="flex-grow">
+      <slot />
+    </main>
     <Footer />
 
     <script>
@@ -78,7 +80,7 @@ const {
 
       /* Improved accessibility */
       :focus {
-        outline: 2px solid #43302b;
+        outline: 2px solid #7f1d1d;
         outline-offset: 2px;
       }
 

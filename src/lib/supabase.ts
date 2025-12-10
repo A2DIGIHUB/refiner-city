@@ -46,6 +46,25 @@ export async function uploadFile(
           });
 
         if (uploadError) throw uploadError;
+        
+        // Insert metadata into media_files table
+        const { error: insertError } = await supabase
+          .from('media_files')
+          .insert({
+            bucket,
+            path: filePath,
+            size: file.size,
+            mime_type: file.type,
+            metadata: {
+              original_name: file.name,
+              uploaded_at: new Date().toISOString()
+            },
+            user_id: '00000000-0000-0000-0000-000000000000', // Default user ID for anonymous uploads
+            public: true
+          });
+
+        if (insertError) throw insertError;
+        
         return { data: { path: filePath }, error: null };
       } catch (error) {
         attempt++;

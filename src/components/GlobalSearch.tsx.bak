@@ -51,30 +51,32 @@ export function GlobalSearch() {
         <input
           {...getInputProps()}
           type="text"
-          className="pl-10 pr-4 py-2 rounded-lg border border-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent w-full transition-all duration-300"
+          className="pl-10 pr-4 py-2 rounded-lg border border-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent w-full transition-colors duration-300"
           placeholder="Search..."
           aria-label="Search"
         />
       </div>
       <ul
         {...getMenuProps()}
-        className={`absolute z-10 w-full bg-white mt-1 rounded-lg shadow-lg border border-primary-200 ${isOpen && (items.length > 0 || isLoading) ? '' : 'hidden'
-          }`}
+        className={`absolute z-10 w-full bg-white mt-1 rounded-lg shadow-lg border border-primary-200 ${
+          isOpen && (items.length > 0 || isLoading) ? '' : 'hidden'
+        }`}
       >
         {isOpen &&
           items.map((item, index) => (
             <li
               key={item.id}
               {...getItemProps({ item, index })}
-              className={`px-4 py-3 cursor-pointer ${highlightedIndex === index
+              className={`px-4 py-3 cursor-pointer ${
+                highlightedIndex === index
                   ? 'bg-primary-100'
                   : 'hover:bg-primary-50'
-                } transition-all duration-200`}
+              } transition-colors duration-200`}
             >
               <a href={item.url} className="block">
                 <div className="flex justify-between">
-                  <span className="font-medium text-primary-800">{item.title}</span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-primary-100 text-primary-700">
+                  <span className="font-medium text-primary-900">{item.title}</span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-primary-100 text-primary-800">
                     {item.type}
                   </span>
                 </div>
@@ -82,8 +84,8 @@ export function GlobalSearch() {
             </li>
           ))}
         {isLoading && (
-          <li className="px-4 py-3 text-primary-600 flex items-center">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <li className="px-4 py-3 text-primary-500 flex items-center">
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -91,7 +93,7 @@ export function GlobalSearch() {
           </li>
         )}
         {isOpen && !isLoading && items.length === 0 && (
-          <li className="px-4 py-3 text-primary-600">
+          <li className="px-4 py-3 text-primary-500">
             No results found
           </li>
         )}
