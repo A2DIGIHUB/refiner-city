@@ -22,10 +22,10 @@ export async function signIn(email: string, password: string) {
   const isAdmin = await checkIsAdmin(data.user.id);
   if (!isAdmin) {
     await supabase.auth.signOut();
-    return { 
-      user: null, 
-      session: null, 
-      error: new Error('Unauthorized: Admin access required') 
+    return {
+      user: null,
+      session: null,
+      error: new Error('Unauthorized: Admin access required')
     };
   }
 
@@ -71,7 +71,7 @@ export async function checkIsAdmin(userId?: string): Promise<boolean> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     const id = userId || user?.id;
-    
+
     if (!id) return false;
 
     const { data, error } = await supabase
@@ -182,14 +182,14 @@ export function setAuthCookies(Astro: any, session: Session) {
     path: '/',
     maxAge: 60 * 60 * 24 * 7, // 7 days
     sameSite: 'lax',
-    secure: import.meta.env.PROD,
+    secure: false, // Set to true in production
   });
 
   Astro.cookies.set('sb-refresh-token', session.refresh_token, {
     path: '/',
     maxAge: 60 * 60 * 24 * 30, // 30 days
     sameSite: 'lax',
-    secure: import.meta.env.PROD,
+    secure: false, // Set to true in production
   });
 }
 
